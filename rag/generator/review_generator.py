@@ -1,6 +1,7 @@
 """LLM-based review generation."""
 
 from dataclasses import dataclass
+from typing import Any
 
 import openai
 import structlog
@@ -25,14 +26,19 @@ class ReviewConfig:
 class ReviewGenerator:
     """Generate reviews using LLM (OpenAI API or OpenRouter)."""
 
-    def __init__(self, config: ReviewConfig):
+    def __init__(self, config: ReviewConfig, client: Any | None = None):
         """Initialize review generator.
 
         Args:
             config: ReviewConfig with API settings
+            client: Optional OpenAI-compatible client for testing
         """
         self.config = config
-        self.client = openai.OpenAI(api_key=config.api_key, base_url=config.base_url)
+        self.client = (
+            client
+            if client is not None
+            else openai.OpenAI(api_key=config.api_key, base_url=config.base_url)
+        )
 
     def generate_section(
         self, section_name: str, context_chunks: list[dict], profile_data: dict
